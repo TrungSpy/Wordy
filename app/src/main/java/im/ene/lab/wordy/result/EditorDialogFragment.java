@@ -81,6 +81,7 @@ public class EditorDialogFragment extends DialogFragment {
       mRealm.executeTransaction(new Realm.Transaction() {
         @Override public void execute(Realm realm) {
           mItem.setResult(newContent.toString());
+          mItem.setState(ResultItem.STATE_EDITTED);
           realm.copyToRealmOrUpdate(mItem);
           if (mCallback != null) {
             mCallback.onItemUpdated(mItem);
