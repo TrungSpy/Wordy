@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -30,12 +31,16 @@ import io.realm.Realm;
 public class EditorDialogFragment extends DialogFragment {
 
   public static final String TAG = "EditorDialogFragment";
-
+  public static final String ARGS_ITEM_ID = "args_item_detail_id";
+  @Bind(R.id.item_image) ImageView mImage;
+  @Bind(R.id.item_old_content) TextView mOldContent;
+  @Bind(R.id.edit_item_content) TextInputEditText mEditText;
+  @Bind(R.id.editor_cancel) Button mBtnCancel;
+  @Bind(R.id.editor_submit) Button mBtnSubmit;
   private Long itemId;
   private ResultItem mItem;
   private Realm mRealm;
-
-  public static final String ARGS_ITEM_ID = "args_item_detail_id";
+  private Callback mCallback;
 
   public static EditorDialogFragment newInstance(Long itemId) {
     EditorDialogFragment fragment = new EditorDialogFragment();
@@ -47,6 +52,10 @@ public class EditorDialogFragment extends DialogFragment {
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (mCallback == null && getTargetFragment() instanceof Callback) {
+      mCallback = (Callback) getTargetFragment();
+    }
+
     if (getArguments() != null) {
       itemId = getArguments().getLong(ARGS_ITEM_ID);
     }
@@ -65,13 +74,8 @@ public class EditorDialogFragment extends DialogFragment {
     return inflater.inflate(R.layout.fragment_dialog_editor, container, false);
   }
 
-  @Bind(R.id.item_image) ImageView mImage;
-  @Bind(R.id.item_old_content) TextView mOldContent;
-  @Bind(R.id.edit_item_content) TextInputEditText mEditText;
-  @Bind(R.id.editor_cancel) Button mBtnCancel;
-  @Bind(R.id.editor_submit) Button mBtnSubmit;
-
   @OnClick(R.id.editor_cancel) void cancel() {
+    Toast.makeText(getActivity(), "Meh~", Toast.LENGTH_SHORT).show();
     dismissAllowingStateLoss();
   }
 
@@ -86,10 +90,12 @@ public class EditorDialogFragment extends DialogFragment {
           if (mCallback != null) {
             mCallback.onItemUpdated(mItem);
           }
-          dismissAllowingStateLoss();
         }
       });
+    } else {
+      Toast.makeText(getActivity(), "Meh~", Toast.LENGTH_SHORT).show();
     }
+    dismissAllowingStateLoss();
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -111,15 +117,13 @@ public class EditorDialogFragment extends DialogFragment {
     lp.height = Math.min(maxHeight, metrics.heightPixels);
     dialog.getWindow().setAttributes(lp);
 
-    Glide.with(this).load(mItem.fileUri).centerCrop().into(mImage);
+    Glide.with(this).load(mItem.filePath).centerCrop().into(mImage);
     if (!Utils.isEmpty(mItem.result)) {
       mOldContent.setText(mItem.result);
     } else {
       mOldContent.setText("---");
     }
   }
-
-  private Callback mCallback;
 
   @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
@@ -134,6 +138,7 @@ public class EditorDialogFragment extends DialogFragment {
   }
 
   @Override public void onCancel(DialogInterface dialog) {
+    Toast.makeText(getActivity(), "Meh~", Toast.LENGTH_SHORT).show();
     super.onCancel(dialog);
     mCallback = null;
   }

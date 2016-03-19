@@ -69,7 +69,7 @@ public class ResultItemViewHolder extends RecyclerView.ViewHolder {
       mText.setText(item.result);
     }
 
-    Glide.with(itemView.getContext()).load(item.fileUri).fitCenter().into(mImage);
+    Glide.with(itemView.getContext()).load(item.filePath).fitCenter().into(mImage);
   }
 
   public void onAttachedToParent() {

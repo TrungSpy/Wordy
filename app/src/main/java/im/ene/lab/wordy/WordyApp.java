@@ -1,6 +1,7 @@
 package im.ene.lab.wordy;
 
 import android.app.Application;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -18,9 +19,11 @@ public class WordyApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
-    configuration =
-        new RealmConfiguration.Builder(this).name("wordy.realm")
-            .deleteRealmIfMigrationNeeded()
-            .schemaVersion(42).build();
+    AndroidThreeTen.init(this);
+
+    configuration = new RealmConfiguration.Builder(this).name("wordy.realm")
+        .deleteRealmIfMigrationNeeded()
+        .schemaVersion(42)
+        .build();
   }
 }

@@ -20,7 +20,7 @@ public class ResultItem extends RealmObject {
 
   public static final String KEY_CREATED_AT = "createdAt";
 
-  public String fileUri;
+  public String filePath;
   @PrimaryKey public Long createdAt;
   public String result;
   public Integer state;
@@ -29,14 +29,14 @@ public class ResultItem extends RealmObject {
 
   }
 
-  public ResultItem(String fileUri, Long createdAt) {
-    this.fileUri = fileUri;
+  public ResultItem(String filePath, Long createdAt) {
+    this.filePath = filePath;
     this.createdAt = createdAt;
     this.state = STATE_INIT;
   }
 
-  public ResultItem(String fileUri, Long createdAt, ImageKeywords source) {
-    this(fileUri, createdAt);
+  public ResultItem(String filePath, Long createdAt, ImageKeywords source) {
+    this(filePath, createdAt);
     // be careful: shallow copy only
     if (source != null) {
       setImageKeywords(source.getImageKeywords());
@@ -59,12 +59,12 @@ public class ResultItem extends RealmObject {
 
     ResultItem item = (ResultItem) o;
 
-    return fileUri.equals(item.fileUri) && createdAt.equals(item.createdAt) && (result != null
+    return filePath.equals(item.filePath) && createdAt.equals(item.createdAt) && (result != null
         ? result.equals(item.result) : item.result == null && state.equals(item.state));
   }
 
   @Override public int hashCode() {
-    int result1 = fileUri.hashCode();
+    int result1 = filePath.hashCode();
     result1 = 31 * result1 + createdAt.hashCode();
     result1 = 31 * result1 + (result != null ? result.hashCode() : 0);
     result1 = 31 * result1 + state.hashCode();

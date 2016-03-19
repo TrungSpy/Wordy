@@ -2,13 +2,13 @@ package im.ene.lab.wordy;
 
 import android.content.DialogInterface;
 import android.hardware.camera2.TotalCaptureResult;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
@@ -24,12 +24,12 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import java.io.File;
-import java.util.Date;
+import org.threeten.bp.ZonedDateTime;
 import rx.Observable;
-import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
     mResults.setLayoutManager(
         new GridLayoutManager(this, 1, LinearLayoutManager.HORIZONTAL, false));
 
-    mAdapter = new ResultsAdapter();
+    mAdapter = new ResultsAdapter(mRealm);
     mAdapter.setItemClickListener(mClickListener);
     mAdapter.setItemLongClickListener(this);
 
@@ -141,57 +141,102 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onCaptured(TotalCaptureResult result, final File file) {
-    final ResultItem item = new ResultItem(file.toURI().toString(), (new Date().getTime()), null);
+    final Long itemId = ZonedDateTime.now().toEpochSecond();
+    final ResultItem item = new ResultItem(Uri.fromFile(file).getPath(), itemId, null);
     item.setState(ResultItem.STATE_UNKNOWN);
+    // Create item in realm
+    WordyApp.realm().executeTransaction(new Realm.Transaction() {
+      @Override public void execute(Realm realm) {
+        realm.copyToRealmOrUpdate(item);
+      }
+    });
 
     runOnUiThread(new Runnable() {
       @Override public void run() {
-        mAdapter.addItem(item);
         mResults.scrollToPosition(0);
+      }
+    });
 
-        mRealm.executeTransaction(new Realm.Transaction() {
+    // Request Alchemy API
+    Observable.defer(new Func0<Observable<ImageKeywords>>() {
+      @Override public Observable<ImageKeywords> call() {
+        return Observable.just(alchemyVision.getImageKeywords(file, true, true));
+      }
+    }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
+      @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
+        item.setImageKeywords(imageKeywords.getImageKeywords());
+        return Observable.just(item);
+      }
+    }).subscribeOn(Schedulers.io()).subscribe(new Action1<ResultItem>() {
+      @Override public void call(final ResultItem item) {
+        item.setState(ResultItem.STATE_SUCCESS);
+        WordyApp.realm().executeTransaction(new Realm.Transaction() {
+          @Override public void execute(Realm realm) {
+            realm.copyToRealmOrUpdate(item);
+          }
+        });
+      }
+    }, new Action1<Throwable>() {
+      @Override public void call(Throwable throwable) {
+        item.setState(ResultItem.STATE_FAILED);
+        WordyApp.realm().executeTransaction(new Realm.Transaction() {
           @Override public void execute(Realm realm) {
             realm.copyToRealmOrUpdate(item);
           }
         });
       }
     });
+  }
 
-    // after capture a photo
-    mSubscription = Observable.defer(new Func0<Observable<ImageKeywords>>() {
-      @Override public Observable<ImageKeywords> call() {
-        ImageKeywords keywords = alchemyVision.getImageKeywords(file, true, true);
-        return Observable.just(keywords);
+  @Override protected void onResume() {
+    super.onResume();
+    // Retry
+    RealmResults<ResultItem> retryCache = mRealm.where(ResultItem.class)
+        .notEqualTo("state", ResultItem.STATE_EDITED)
+        .notEqualTo("state", ResultItem.STATE_SUCCESS)
+        .findAll();
+
+    Observable.from(retryCache).flatMap(new Func1<ResultItem, Observable<ResultItem>>() {
+      @Override public Observable<ResultItem> call(ResultItem item) {
+        // Convert from Realm Object to normal Object
+        ResultItem resultItem = new ResultItem(item.filePath, item.createdAt);
+        resultItem.setResult(item.result);
+        return Observable.just(resultItem);
       }
-    })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<ImageKeywords>() {
-          @Override public void onCompleted() {
+    }).observeOn(Schedulers.io()).forEach(new Action1<ResultItem>() {
+      @Override public void call(final ResultItem item /* In memory POJO, not realm object */) {
+        // Request Alchemy API
+        Observable.defer(new Func0<Observable<ImageKeywords>>() {
+          @Override public Observable<ImageKeywords> call() {
+            return Observable.just(
+                alchemyVision.getImageKeywords(new File(item.filePath), true, true));
           }
-
-          @Override public void onError(Throwable e) {
-            item.setState(ResultItem.STATE_FAILED);
-            mRealm.executeTransaction(new Realm.Transaction() {
-              @Override public void execute(Realm realm) {
-                realm.copyToRealmOrUpdate(item);
-              }
-            });
-            mAdapter.updateItem(item);
+        }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
+          @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
+            item.setImageKeywords(imageKeywords.getImageKeywords());
+            return Observable.just(item);
           }
-
-          @Override public void onNext(ImageKeywords recognizedImage) {
-            Log.d(TAG, "onNext() called with: " + "recognizedImage = [" + recognizedImage + "]");
-            item.setImageKeywords(recognizedImage.getImageKeywords());
+        }).subscribeOn(Schedulers.io()).subscribe(new Action1<ResultItem>() {
+          @Override public void call(final ResultItem item) {
             item.setState(ResultItem.STATE_SUCCESS);
-            mRealm.executeTransaction(new Realm.Transaction() {
+            WordyApp.realm().executeTransaction(new Realm.Transaction() {
               @Override public void execute(Realm realm) {
                 realm.copyToRealmOrUpdate(item);
               }
             });
-            mAdapter.updateItem(item);
+          }
+        }, new Action1<Throwable>() {
+          @Override public void call(Throwable throwable) {
+            item.setState(ResultItem.STATE_FAILED);
+            WordyApp.realm().executeTransaction(new Realm.Transaction() {
+              @Override public void execute(Realm realm) {
+                realm.copyToRealmOrUpdate(item);
+              }
+            });
           }
         });
+      }
+    });
   }
 
   @Override protected void onPause() {
@@ -242,9 +287,10 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onChange() {
+    mAdapter.notifyDataSetChanged();
   }
 
   @Override public void onItemUpdated(ResultItem item) {
-    mAdapter.updateItem(item);
+    mAdapter.notifyDataSetChanged();
   }
 }

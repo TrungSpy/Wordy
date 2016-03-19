@@ -1,10 +1,12 @@
 package im.ene.lab.wordy.result;
 
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.View;
 import android.view.ViewGroup;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
+import org.threeten.bp.ZonedDateTime;
 
 /**
  * Created by eneim on 3/19/16.
@@ -13,30 +15,19 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   private final Object LOCK = new Object();
 
-  private final SortedList<ResultItem> mSortedItems;
+  private final Realm mRealm;
+  private final RealmResults<ResultItem> mSortedItems;
 
   private OnItemClickListener mItemClickListener;
 
   private OnItemLongClickListener mItemLongClickListener;
 
-  public ResultsAdapter() {
+  public ResultsAdapter(Realm realm) {
     super();
-    mSortedItems =
-        new SortedList<>(ResultItem.class, new SortedListAdapterCallback<ResultItem>(this) {
-          @Override public int compare(ResultItem o1, ResultItem o2) {
-            return o2.createdAt.compareTo(o1.createdAt);
-          }
-
-          @Override public boolean areContentsTheSame(ResultItem oldItem, ResultItem newItem) {
-            return newItem.fileUri.equals(oldItem.fileUri)
-                && newItem.result.equals(oldItem.result)
-                && newItem.state.equals(oldItem.state);
-          }
-
-          @Override public boolean areItemsTheSame(ResultItem item1, ResultItem item2) {
-            return item1.fileUri.equals(item2.fileUri);
-          }
-        });
+    mRealm = realm;
+    mSortedItems = mRealm.where(ResultItem.class)
+        .greaterThanOrEqualTo(ResultItem.KEY_CREATED_AT, ZonedDateTime.now().toEpochSecond())
+        .findAllSorted(ResultItem.KEY_CREATED_AT, Sort.DESCENDING);
   }
 
   public void setItemClickListener(OnItemClickListener clickListener) {
@@ -50,12 +41,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
   public void addItem(ResultItem item) {
     synchronized (LOCK) {
       mSortedItems.add(item);
-    }
-  }
-
-  public void updateItem(ResultItem item) {
-    synchronized (LOCK) {
-      mSortedItems.updateItemAt(mSortedItems.indexOf(item), item);
     }
   }
 
