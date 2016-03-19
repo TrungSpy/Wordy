@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override public void onCaptured(TotalCaptureResult result, final File file) {
     final Long itemId = ZonedDateTime.now().toEpochSecond();
-    final ResultItem item = new ResultItem(Uri.fromFile(file).getPath(), itemId, null);
+    final ResultItem item = new ResultItem(Uri.fromFile(file).getPath(), itemId);
     item.setState(ResultItem.STATE_INIT);
     // Create item in realm
     WordyApp.realm().executeTransaction(new Realm.Transaction() {
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity
     });
 
     // Request Alchemy API
-    Observable.defer(new Func0<Observable<ImageKeywords>>() {
+    mSubscription = Observable.defer(new Func0<Observable<ImageKeywords>>() {
       @Override public Observable<ImageKeywords> call() {
         item.setState(ResultItem.STATE_UNKNOWN);
         // Create item in realm
