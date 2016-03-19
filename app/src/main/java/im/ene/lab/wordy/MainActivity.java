@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity
       }
     }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
+        Log.d(TAG, "call() called with: " + "imageKeywords = [" + imageKeywords + "]");
         item.setImageKeywords(imageKeywords.getImageKeywords());
         return Observable.just(item);
       }
@@ -220,6 +222,7 @@ public class MainActivity extends AppCompatActivity
           }
         }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
           @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
+            Log.d(TAG, "call() called with: " + "imageKeywords = [" + imageKeywords + "]");
             item.setImageKeywords(imageKeywords.getImageKeywords());
             return Observable.just(item);
           }
@@ -298,6 +301,6 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onItemUpdated(ResultItem item) {
-    mAdapter.notifyDataSetChanged();
+    // mAdapter.notifyDataSetChanged();
   }
 }
