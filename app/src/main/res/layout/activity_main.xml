@@ -9,9 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="140dp"
+        android:layout_gravity="bottom"
+        android:layout_marginEnd="72dp"
         android:paddingEnd="@dimen/horizontal_page_margin"
         android:paddingStart="@dimen/fab_margin">
 
