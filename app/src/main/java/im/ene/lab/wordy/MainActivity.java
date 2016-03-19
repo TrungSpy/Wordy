@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
   @Override public void onCaptured(TotalCaptureResult result, final File file) {
     final Long itemId = ZonedDateTime.now().toEpochSecond();
     final ResultItem item = new ResultItem(Uri.fromFile(file).getPath(), itemId, null);
-    item.setState(ResultItem.STATE_UNKNOWN);
+    item.setState(ResultItem.STATE_INIT);
     // Create item in realm
     WordyApp.realm().executeTransaction(new Realm.Transaction() {
       @Override public void execute(Realm realm) {
@@ -160,6 +160,13 @@ public class MainActivity extends AppCompatActivity
     // Request Alchemy API
     Observable.defer(new Func0<Observable<ImageKeywords>>() {
       @Override public Observable<ImageKeywords> call() {
+        item.setState(ResultItem.STATE_UNKNOWN);
+        // Create item in realm
+        WordyApp.realm().executeTransaction(new Realm.Transaction() {
+          @Override public void execute(Realm realm) {
+            realm.copyToRealmOrUpdate(item);
+          }
+        });
         return Observable.just(alchemyVision.getImageKeywords(file, true, true));
       }
     }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {

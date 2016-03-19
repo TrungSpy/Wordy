@@ -26,7 +26,6 @@ public class ResultItem extends RealmObject {
   public Integer state;
 
   public ResultItem() {
-
   }
 
   public ResultItem(String filePath, Long createdAt) {
