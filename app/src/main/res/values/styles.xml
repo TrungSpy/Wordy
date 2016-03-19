@@ -1,8 +1,29 @@
 <resources>
 
-    <style name="MaterialTheme" parent="Theme.AppCompat.Light.NoActionBar" />
+  <style name="MaterialTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
 
-    <style name="MaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+  <style name="MaterialTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <style name="MaterialTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+  <style name="MaterialTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+  <style name="TextAppearance.Wordy.Init" parent="TextAppearance.AppCompat.Body1">
+    <item name="android:textColor">#C9EFB4</item>
+  </style>
+
+  <style name="TextAppearance.Wordy.Failed" parent="TextAppearance.AppCompat.Body1">
+    <item name="android:textColor">#f5f5f5</item>
+  </style>
+
+  <style name="TextAppearance.Wordy.Unknown" parent="TextAppearance.AppCompat.Body1">
+    <item name="android:textColor">#C9EFB4</item>
+  </style>
+
+  <style name="TextAppearance.Wordy.Success" parent="TextAppearance.AppCompat.Medium">
+    <item name="android:textColor">#ff0</item>
+  </style>
+
+  <style name="TextAppearance.Wordy.Edited" parent="TextAppearance.AppCompat.Medium">
+    <item name="android:textColor">#C9EFB4</item>
+  </style>
+
 </resources>

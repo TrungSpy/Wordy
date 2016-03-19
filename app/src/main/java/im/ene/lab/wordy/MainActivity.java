@@ -16,22 +16,25 @@ import com.ibm.watson.developer_cloud.alchemy.v1.model.ImageKeywords;
 import im.ene.lab.wordy.camera.Camera2BasicFragment;
 import im.ene.lab.wordy.data.api.ApiService;
 import im.ene.lab.wordy.detail.ReviewActivity;
+import im.ene.lab.wordy.result.EditorDialogFragment;
 import im.ene.lab.wordy.result.ResultItem;
 import im.ene.lab.wordy.result.ResultsAdapter;
 import im.ene.lab.wordy.utils.Utils;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import java.io.File;
 import java.util.Date;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity
-    implements Camera2BasicFragment.Callback, ResultsAdapter.OnItemClickListener,
-    ResultsAdapter.OnItemLongClickListener {
+    implements Camera2BasicFragment.Callback, ResultsAdapter.OnItemLongClickListener,
+    RealmChangeListener, EditorDialogFragment.Callback {
 
   private static final String TAG = "MainActivity";
   private final AlchemyVision alchemyVision = new AlchemyVision();
@@ -40,6 +43,20 @@ public class MainActivity extends AppCompatActivity
   private ResultsAdapter mAdapter;
 
   private Realm mRealm;
+  private Subscription mSubscription;
+
+  private ResultsAdapter.OnResultItemClickListener mClickListener =
+      new ResultsAdapter.OnResultItemClickListener() {
+
+        @Override public void openItemDetail(ResultItem item) {
+          startActivity(new Intent(MainActivity.this, ReviewActivity.class));
+        }
+
+        @Override public void editItem(ResultItem item) {
+          EditorDialogFragment dialogFragment = EditorDialogFragment.newInstance(item.createdAt);
+          dialogFragment.show(getSupportFragmentManager(), EditorDialogFragment.TAG);
+        }
+      };
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -47,13 +64,14 @@ public class MainActivity extends AppCompatActivity
     alchemyVision.setApiKey(ApiService.alchemyApikey);
 
     mRealm = WordyApp.realm();
+    mRealm.addChangeListener(this);
 
     mResults = (RecyclerView) findViewById(R.id.result);
     mResults.setLayoutManager(
         new GridLayoutManager(this, 1, LinearLayoutManager.HORIZONTAL, false));
 
     mAdapter = new ResultsAdapter();
-    mAdapter.setItemClickListener(this);
+    mAdapter.setItemClickListener(mClickListener);
     mAdapter.setItemLongClickListener(this);
 
     mResults.setAdapter(mAdapter);
@@ -96,7 +114,7 @@ public class MainActivity extends AppCompatActivity
     });
 
     // after capture a photo
-    Observable.defer(new Func0<Observable<ImageKeywords>>() {
+    mSubscription = Observable.defer(new Func0<Observable<ImageKeywords>>() {
       @Override public Observable<ImageKeywords> call() {
         ImageKeywords keywords = alchemyVision.getImageKeywords(file, true, true);
         return Observable.just(keywords);
@@ -134,14 +152,15 @@ public class MainActivity extends AppCompatActivity
 
   @Override protected void onDestroy() {
     if (mRealm != null) {
+      mRealm.removeChangeListener(this);
       mRealm.close();
     }
 
+    if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+      mSubscription.unsubscribe();
+    }
+    mClickListener = null;
     super.onDestroy();
-  }
-
-  @Override public void onItemClick(ResultsAdapter parent, View view, int position) {
-    startActivity(new Intent(this, ReviewActivity.class));
   }
 
   @Override
@@ -171,5 +190,12 @@ public class MainActivity extends AppCompatActivity
         .create()
         .show();
     return true;
+  }
+
+  @Override public void onChange() {
+  }
+
+  @Override public void onItemUpdated(ResultItem item) {
+    mAdapter.updateItem(item);
   }
 }

@@ -30,6 +30,10 @@
         android:name=".detail.ReviewActivity"
         android:parentActivityName=".MainActivity">
     </activity>
+
+    <meta-data
+        android:name="im.ene.lab.wordy.utils.GlideConfiguration"
+        android:value="GlideModule"/>
   </application>
 
 </manifest>

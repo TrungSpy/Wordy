@@ -67,12 +67,12 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   @Override public ResultItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     final ResultItemViewHolder viewHolder = ResultItemViewHolder.createViewHolder(parent, viewType);
-    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+    viewHolder.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         int position = viewHolder.getAdapterPosition();
         if (position != RecyclerView.NO_POSITION) {
           if (mItemClickListener != null) {
-            mItemClickListener.onItemClick(ResultsAdapter.this, v, position);
+            mItemClickListener.onItemClick(ResultsAdapter.this, viewHolder, v, position);
           }
         }
       }
@@ -123,7 +123,26 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
   }
 
   public interface OnItemClickListener {
-    void onItemClick(ResultsAdapter parent, View view, int position);
+    void onItemClick(ResultsAdapter parent, ResultItemViewHolder viewHolder, View view,
+        int position);
+  }
+
+  public static abstract class OnResultItemClickListener implements OnItemClickListener {
+
+    public abstract void openItemDetail(ResultItem item);
+
+    public abstract void editItem(ResultItem item);
+
+    @Override
+    public void onItemClick(ResultsAdapter parent, ResultItemViewHolder viewHolder, View view,
+        int position) {
+      ResultItem item = parent.getItem(position);
+      if (view == viewHolder.mTextContainer) {
+        editItem(item);
+      } else if (view == viewHolder.itemView) {
+        openItemDetail(item);
+      }
+    }
   }
 
   public interface OnItemLongClickListener {

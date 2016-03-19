@@ -16,6 +16,7 @@ public class ResultItem extends RealmObject {
   public static final int STATE_UNKNOWN = 0;
   public static final int STATE_SUCCESS = 1;
   public static final int STATE_FAILED = -1;
+  public static final int STATE_EDITTED = 2;
 
   public static final String KEY_CREATED_AT = "createdAt";
 
