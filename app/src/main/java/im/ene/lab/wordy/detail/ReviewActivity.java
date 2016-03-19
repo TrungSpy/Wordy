@@ -1,5 +1,7 @@
 package im.ene.lab.wordy.detail;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +14,7 @@ import butterknife.ButterKnife;
 import im.ene.lab.wordy.R;
 import im.ene.lab.wordy.WordyApp;
 import im.ene.lab.wordy.result.ResultItem;
+import im.ene.lab.wordy.utils.Utils;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
@@ -20,7 +23,18 @@ public class ReviewActivity extends AppCompatActivity {
 
   @Bind(R.id.results) ViewPager mResults;
 
+  public static final String EXTRAS_INIT_ITEM_ID = "extra_detail_init_item_id";
+
+  private Long mInitItemId;
+
+  public static Intent createIntent(Context context, ResultItem item) {
+    Intent intent = new Intent(context, ReviewActivity.class);
+    intent.putExtra(EXTRAS_INIT_ITEM_ID, item.createdAt);
+    return intent;
+  }
+
   private Realm mRealm;
+  private RealmResults<ResultItem> mItems;
   private ResultsPagerAdapter mAdapter;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +43,38 @@ public class ReviewActivity extends AppCompatActivity {
     ButterKnife.bind(this);
 
     mRealm = WordyApp.realm();
-    mAdapter = new ResultsPagerAdapter(getSupportFragmentManager(), mRealm);
+    mItems =
+        mRealm.where(ResultItem.class).findAllSorted(ResultItem.KEY_CREATED_AT, Sort.DESCENDING);
+    mAdapter = new ResultsPagerAdapter(getSupportFragmentManager(), mItems);
     mResults.setAdapter(mAdapter);
+
+    if (getIntent() != null) {
+      mInitItemId = getIntent().getLongExtra(EXTRAS_INIT_ITEM_ID, -1L);
+    }
+
+    if (mInitItemId == -1L) {
+      finish();
+    }
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+    if (mAdapter.getCount() > 0) {
+      mResults.setCurrentItem(0);
+    }
+
+    if (!Utils.isEmpty(mItems)) {
+      mResults.postDelayed(new Runnable() {
+        @Override public void run() {
+          for (int i = 0; i < mItems.size(); i++) {
+            if (mItems.get(i).createdAt.equals(mInitItemId)) {
+              mResults.setCurrentItem(i, true);
+              break;
+            }
+          }
+        }
+      }, 500);
+    }
   }
 
   @Override public void onWindowFocusChanged(boolean hasFocus) {
@@ -48,14 +92,11 @@ public class ReviewActivity extends AppCompatActivity {
 
   private static class ResultsPagerAdapter extends FragmentStatePagerAdapter {
 
-    private final Realm mRealm;
     private final RealmResults<ResultItem> mItems;
 
-    public ResultsPagerAdapter(FragmentManager fm, Realm mRealm) {
+    public ResultsPagerAdapter(FragmentManager fm, RealmResults<ResultItem> items) {
       super(fm);
-      this.mRealm = mRealm;
-      this.mItems =
-          mRealm.where(ResultItem.class).findAllSorted(ResultItem.KEY_CREATED_AT, Sort.DESCENDING);
+      this.mItems = items;
     }
 
     @Override public int getCount() {

@@ -1,7 +1,6 @@
 package im.ene.lab.wordy;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.hardware.camera2.TotalCaptureResult;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity
       new ResultsAdapter.OnResultItemClickListener() {
 
         @Override public void openItemDetail(ResultItem item) {
-          startActivity(new Intent(MainActivity.this, ReviewActivity.class));
+          startActivity(ReviewActivity.createIntent(MainActivity.this, item));
         }
 
         @Override public void editItem(ResultItem item) {
