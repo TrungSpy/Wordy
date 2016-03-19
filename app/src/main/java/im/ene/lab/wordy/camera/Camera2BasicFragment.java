@@ -235,7 +235,7 @@ public class Camera2BasicFragment extends Fragment
             mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile, new ImageSavedListener() {
                 @Override
                 public void onImageSaved(File file) {
-                    showToast("Saved: " + file);
+                    // showToast("Saved: " + file);
                     if (file != null) {
                         Log.d(TAG, file.toString());
                     } else {
