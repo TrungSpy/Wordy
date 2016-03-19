@@ -17,17 +17,20 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   private OnItemClickListener mItemClickListener;
 
+  private OnItemLongClickListener mItemLongClickListener;
+
   public ResultsAdapter() {
     super();
     mSortedItems =
         new SortedList<>(ResultItem.class, new SortedListAdapterCallback<ResultItem>(this) {
           @Override public int compare(ResultItem o1, ResultItem o2) {
-            return o2.fileUri.compareTo(o1.fileUri);
+            return o2.createdAt.compareTo(o1.createdAt);
           }
 
           @Override public boolean areContentsTheSame(ResultItem oldItem, ResultItem newItem) {
-            return newItem.fileUri.equals(oldItem.fileUri) && newItem.getImageKeywords()
-                .equals(oldItem.getImageKeywords());
+            return newItem.fileUri.equals(oldItem.fileUri)
+                && newItem.result.equals(oldItem.result)
+                && newItem.state.equals(oldItem.state);
           }
 
           @Override public boolean areItemsTheSame(ResultItem item1, ResultItem item2) {
@@ -36,13 +39,12 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
         });
   }
 
-  public ResultsAdapter(OnItemClickListener clickListener) {
-    this();
+  public void setItemClickListener(OnItemClickListener clickListener) {
     this.mItemClickListener = clickListener;
   }
 
-  public void setItemClickListener(OnItemClickListener clickListener) {
-    this.mItemClickListener = clickListener;
+  public void setItemLongClickListener(OnItemLongClickListener longClickListener) {
+    this.mItemLongClickListener = longClickListener;
   }
 
   public void addItem(ResultItem item) {
@@ -51,9 +53,15 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
     }
   }
 
-  public void updatItem(ResultItem item) {
+  public void updateItem(ResultItem item) {
     synchronized (LOCK) {
       mSortedItems.updateItemAt(mSortedItems.indexOf(item), item);
+    }
+  }
+
+  public void removeItem(ResultItem item) {
+    synchronized (LOCK) {
+      mSortedItems.remove(item);
     }
   }
 
@@ -67,6 +75,21 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
             mItemClickListener.onItemClick(ResultsAdapter.this, v, position);
           }
         }
+      }
+    });
+
+    viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+      @Override public boolean onLongClick(View v) {
+        if (mItemLongClickListener == null) {
+          return false;
+        }
+
+        int position = viewHolder.getAdapterPosition();
+        if (position == RecyclerView.NO_POSITION) {
+          return false;
+        }
+
+        return mItemLongClickListener.onItemLongClick(ResultsAdapter.this, v, position);
       }
     });
     return viewHolder;
@@ -101,5 +124,9 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   public interface OnItemClickListener {
     void onItemClick(ResultsAdapter parent, View view, int position);
+  }
+
+  public interface OnItemLongClickListener {
+    boolean onItemLongClick(ResultsAdapter parent, View view, int position);
   }
 }

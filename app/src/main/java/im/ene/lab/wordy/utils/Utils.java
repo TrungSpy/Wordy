@@ -1,5 +1,6 @@
 package im.ene.lab.wordy.utils;
 
+import android.text.TextUtils;
 import java.util.List;
 
 /**
@@ -7,11 +8,15 @@ import java.util.List;
  */
 public class Utils {
 
-    private Utils() {
+  private Utils() {
 
-    }
+  }
 
-    public static <T> boolean isEmpty(List<T> list) {
-        return list == null || list.size() == 0;
-    }
+  public static <T> boolean isEmpty(List<T> list) {
+    return list == null || list.size() == 0;
+  }
+
+  public static boolean isEmpty(CharSequence sequence) {
+    return sequence == null || TextUtils.isEmpty(sequence);
+  }
 }

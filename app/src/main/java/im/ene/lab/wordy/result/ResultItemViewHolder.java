@@ -33,26 +33,33 @@ public class ResultItemViewHolder extends RecyclerView.ViewHolder {
   }
 
   public void bind(ResultItem item) {
-    if (Utils.isEmpty(item.getImageKeywords())) {
-      mText.setText("(>__<)");
+    if (Utils.isEmpty(item.result)) {
+      switch (item.state) {
+        case ResultItem.STATE_INIT:
+          mText.setText("(^__^)");
+          break;
+        case ResultItem.STATE_UNKNOWN:
+          mText.setText("~(>__<)~");
+          break;
+        case ResultItem.STATE_FAILED:
+          mText.setText("Failed");
+          break;
+        case ResultItem.STATE_SUCCESS:
+          mText.setText("Success");
+          break;
+      }
     } else {
-      mText.setText(item.getImageKeywords().get(0).getText());
+      mText.setText(item.result);
     }
 
     Glide.with(itemView.getContext()).load(item.fileUri).fitCenter().into(mImage);
-
-    mImage.animate().alpha(0.8f).setDuration(200).start();
   }
 
   public void onAttachedToParent() {
-    if (mImage != null) {
-      mImage.animate().alpha(0.8f).setDuration(200).start();
-    }
+
   }
 
   public void onDetachedFromParent() {
-    if (mImage != null) {
-      mImage.setAlpha(1.f);
-    }
+
   }
 }
