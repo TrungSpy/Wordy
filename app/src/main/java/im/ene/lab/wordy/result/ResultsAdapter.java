@@ -1,10 +1,12 @@
 package im.ene.lab.wordy.result;
 
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.util.SortedListAdapterCallback;
 import android.view.View;
 import android.view.ViewGroup;
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
+import org.threeten.bp.ZonedDateTime;
 
 /**
  * Created by eneim on 3/19/16.
@@ -13,30 +15,19 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   private final Object LOCK = new Object();
 
-  private final SortedList<ResultItem> mSortedItems;
+  private final Realm mRealm;
+  private final RealmResults<ResultItem> mSortedItems;
 
   private OnItemClickListener mItemClickListener;
 
   private OnItemLongClickListener mItemLongClickListener;
 
-  public ResultsAdapter() {
+  public ResultsAdapter(Realm realm) {
     super();
-    mSortedItems =
-        new SortedList<>(ResultItem.class, new SortedListAdapterCallback<ResultItem>(this) {
-          @Override public int compare(ResultItem o1, ResultItem o2) {
-            return o2.createdAt.compareTo(o1.createdAt);
-          }
-
-          @Override public boolean areContentsTheSame(ResultItem oldItem, ResultItem newItem) {
-            return newItem.fileUri.equals(oldItem.fileUri)
-                && newItem.result.equals(oldItem.result)
-                && newItem.state.equals(oldItem.state);
-          }
-
-          @Override public boolean areItemsTheSame(ResultItem item1, ResultItem item2) {
-            return item1.fileUri.equals(item2.fileUri);
-          }
-        });
+    mRealm = realm;
+    mSortedItems = mRealm.where(ResultItem.class)
+        .greaterThanOrEqualTo(ResultItem.KEY_CREATED_AT, ZonedDateTime.now().toEpochSecond())
+        .findAllSorted(ResultItem.KEY_CREATED_AT, Sort.DESCENDING);
   }
 
   public void setItemClickListener(OnItemClickListener clickListener) {
@@ -53,12 +44,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
     }
   }
 
-  public void updateItem(ResultItem item) {
-    synchronized (LOCK) {
-      mSortedItems.updateItemAt(mSortedItems.indexOf(item), item);
-    }
-  }
-
   public void removeItem(ResultItem item) {
     synchronized (LOCK) {
       mSortedItems.remove(item);
@@ -67,12 +52,12 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
 
   @Override public ResultItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     final ResultItemViewHolder viewHolder = ResultItemViewHolder.createViewHolder(parent, viewType);
-    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+    viewHolder.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         int position = viewHolder.getAdapterPosition();
         if (position != RecyclerView.NO_POSITION) {
           if (mItemClickListener != null) {
-            mItemClickListener.onItemClick(ResultsAdapter.this, v, position);
+            mItemClickListener.onItemClick(ResultsAdapter.this, viewHolder, v, position);
           }
         }
       }
@@ -123,7 +108,26 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
   }
 
   public interface OnItemClickListener {
-    void onItemClick(ResultsAdapter parent, View view, int position);
+    void onItemClick(ResultsAdapter parent, ResultItemViewHolder viewHolder, View view,
+        int position);
+  }
+
+  public static abstract class OnResultItemClickListener implements OnItemClickListener {
+
+    public abstract void openItemDetail(ResultItem item);
+
+    public abstract void editItem(ResultItem item);
+
+    @Override
+    public void onItemClick(ResultsAdapter parent, ResultItemViewHolder viewHolder, View view,
+        int position) {
+      ResultItem item = parent.getItem(position);
+      if (view == viewHolder.mTextContainer) {
+        editItem(item);
+      } else if (view == viewHolder.itemView) {
+        openItemDetail(item);
+      }
+    }
   }
 
   public interface OnItemLongClickListener {

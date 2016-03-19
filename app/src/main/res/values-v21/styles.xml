@@ -1,9 +1,9 @@
 <resources>
 
-    <style name="MaterialTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:navigationBarColor">#80000000</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
+  <style name="MaterialTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="android:background">#00000000</item>
+  </style>
 </resources>

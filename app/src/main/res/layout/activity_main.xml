@@ -2,25 +2,41 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000">
+    android:background="#000"
+    >
 
-    <FrameLayout
-        android:id="@+id/container"
+  <FrameLayout
+      android:id="@+id/container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      />
+
+  <FrameLayout
+      android:layout_width="match_parent"
+      android:layout_height="156dp"
+      android:layout_gravity="bottom"
+      android:layout_marginEnd="72dp"
+      android:paddingEnd="@dimen/horizontal_page_margin"
+      android:paddingStart="@dimen/fab_margin"
+      >
+
+    <TextView
+        android:id="@+id/empty_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="44dp"
+        android:gravity="top"
+        android:paddingTop="@dimen/activity_horizontal_margin"
+        android:text="Try me with a Photo ;)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="@android:color/white"
+        />
 
-
-    <FrameLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/result"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_gravity="bottom"
-        android:layout_marginEnd="72dp"
-        android:paddingEnd="@dimen/horizontal_page_margin"
-        android:paddingStart="@dimen/fab_margin">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </FrameLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        />
+  </FrameLayout>
 </FrameLayout>

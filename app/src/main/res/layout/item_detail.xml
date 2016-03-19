@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+  <!-- A colorful background -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      >
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#99DDC8"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#95BF74"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#659B5E"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#556F44"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#283F3B"
+        />
+
+  </LinearLayout>
+
+  <android.support.v7.widget.CardView
+      android:id="@+id/image_container"
+      android:layout_width="288dp"
+      android:layout_height="384dp"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="36dp"
+      app:cardCornerRadius="4dp"
+      app:cardPreventCornerOverlap="true"
+      >
+
+    <ImageView
+        android:id="@+id/item_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        />
+  </android.support.v7.widget.CardView>
+
+  <android.support.v7.widget.CardView
+      android:id="@+id/detail_container"
+      android:layout_width="288dp"
+      android:layout_height="match_parent"
+      android:layout_alignParentBottom="true"
+      android:layout_below="@id/image_container"
+      android:layout_centerHorizontal="true"
+      android:layout_marginBottom="36dp"
+      android:layout_marginTop="36dp"
+      app:cardBackgroundColor="#ffffff"
+      app:cardCornerRadius="4dp"
+      app:cardPreventCornerOverlap="true"
+      >
+
+    <Button
+        android:id="@+id/item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:drawableEnd="@drawable/ic_create_black_24dp"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingBottom="8dp"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="?attr/colorAccent"
+        tools:text="Word"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        />
+
+    <TextView
+        android:id="@+id/item_timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="#e5e5e5"
+        tools:text="2016-11-22"
+        />
+
+  </android.support.v7.widget.CardView>
+</RelativeLayout>

@@ -16,26 +16,26 @@ public class ResultItem extends RealmObject {
   public static final int STATE_UNKNOWN = 0;
   public static final int STATE_SUCCESS = 1;
   public static final int STATE_FAILED = -1;
+  public static final int STATE_EDITED = 2;
 
   public static final String KEY_CREATED_AT = "createdAt";
 
-  public String fileUri;
+  public String filePath;
   @PrimaryKey public Long createdAt;
   public String result;
   public Integer state;
 
   public ResultItem() {
-
   }
 
-  public ResultItem(String fileUri, Long createdAt) {
-    this.fileUri = fileUri;
+  public ResultItem(String filePath, Long createdAt) {
+    this.filePath = filePath;
     this.createdAt = createdAt;
     this.state = STATE_INIT;
   }
 
-  public ResultItem(String fileUri, Long createdAt, ImageKeywords source) {
-    this(fileUri, createdAt);
+  public ResultItem(String filePath, Long createdAt, ImageKeywords source) {
+    this(filePath, createdAt);
     // be careful: shallow copy only
     if (source != null) {
       setImageKeywords(source.getImageKeywords());
@@ -58,16 +58,16 @@ public class ResultItem extends RealmObject {
 
     ResultItem item = (ResultItem) o;
 
-    if (!fileUri.equals(item.fileUri)) return false;
-    if (!createdAt.equals(item.createdAt)) return false;
-    if (result != null ? !result.equals(item.result) : item.result != null) return false;
-    return state.equals(item.state);
+    return filePath.equals(item.filePath) && createdAt.equals(item.createdAt) && (result != null
+        ? result.equals(item.result) : item.result == null && state.equals(item.state));
   }
 
   @Override public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + fileUri.hashCode();
-    return result;
+    int result1 = filePath.hashCode();
+    result1 = 31 * result1 + createdAt.hashCode();
+    result1 = 31 * result1 + (result != null ? result.hashCode() : 0);
+    result1 = 31 * result1 + state.hashCode();
+    return result1;
   }
 
   public void setResult(String result) {

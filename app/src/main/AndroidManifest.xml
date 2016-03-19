@@ -25,8 +25,15 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
-    <activity android:name=".ReviewActivity">
+    <activity
+        android:launchMode="singleTop"
+        android:name=".detail.ReviewActivity"
+        android:parentActivityName=".MainActivity">
     </activity>
+
+    <meta-data
+        android:name="im.ene.lab.wordy.utils.GlideConfiguration"
+        android:value="GlideModule"/>
   </application>
 
 </manifest>
