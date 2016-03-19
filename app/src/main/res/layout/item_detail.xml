@@ -15,28 +15,35 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#C9EFB4"
+        android:background="#99DDC8"
         />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#828AB0"
+        android:background="#95BF74"
         />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#5B6195"
+        android:background="#659B5E"
         />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#3F51B5"
+        android:background="#556F44"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#283F3B"
         />
 
   </LinearLayout>
@@ -61,6 +68,7 @@
   </android.support.v7.widget.CardView>
 
   <android.support.v7.widget.CardView
+      android:id="@+id/detail_container"
       android:layout_width="288dp"
       android:layout_height="match_parent"
       android:layout_alignParentBottom="true"
@@ -72,6 +80,12 @@
       app:cardCornerRadius="4dp"
       app:cardPreventCornerOverlap="true"
       >
+
+    <TextView
+        android:id="@+id/item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
 
   </android.support.v7.widget.CardView>
 </RelativeLayout>

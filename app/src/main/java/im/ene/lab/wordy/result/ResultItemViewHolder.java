@@ -52,7 +52,7 @@ public class ResultItemViewHolder extends RecyclerView.ViewHolder {
           break;
         case ResultItem.STATE_FAILED:
           TextViewCompat.setTextAppearance(mText, R.style.TextAppearance_Wordy_Failed);
-          mText.setText("Something\nwrong :'(");
+          mText.setText("I'm failed.\nFix me plz :'(");
           break;
         case ResultItem.STATE_SUCCESS:
           TextViewCompat.setTextAppearance(mText, R.style.TextAppearance_Wordy_Success);
@@ -60,7 +60,7 @@ public class ResultItemViewHolder extends RecyclerView.ViewHolder {
           break;
       }
     } else {
-      if (item.state == ResultItem.STATE_EDITTED) {
+      if (item.state == ResultItem.STATE_EDITED) {
         TextViewCompat.setTextAppearance(mText, R.style.TextAppearance_Wordy_Edited);
       } else if (item.state == ResultItem.STATE_SUCCESS) {
         TextViewCompat.setTextAppearance(mText, R.style.TextAppearance_Wordy_Success);

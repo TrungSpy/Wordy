@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
 import com.ibm.watson.developer_cloud.alchemy.v1.model.ImageKeywords;
 import im.ene.lab.wordy.camera.Camera2BasicFragment;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity
   private static final String TAG = "MainActivity";
   private final AlchemyVision alchemyVision = new AlchemyVision();
 
+  private TextView mEmptyText;
   private RecyclerView mResults;
   private ResultsAdapter mAdapter;
 
@@ -57,14 +59,56 @@ public class MainActivity extends AppCompatActivity
         }
       };
 
+  private RecyclerView.AdapterDataObserver mDataChangeObserver =
+      new RecyclerView.AdapterDataObserver() {
+        @Override public void onChanged() {
+          super.onChanged();
+          onDataChanged();
+        }
+
+        @Override public void onItemRangeChanged(int positionStart, int itemCount) {
+          super.onItemRangeChanged(positionStart, itemCount);
+          onDataChanged();
+        }
+
+        @Override public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
+          super.onItemRangeChanged(positionStart, itemCount, payload);
+          onDataChanged();
+        }
+
+        @Override public void onItemRangeInserted(int positionStart, int itemCount) {
+          super.onItemRangeInserted(positionStart, itemCount);
+          onDataChanged();
+        }
+
+        @Override public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+          super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+          onDataChanged();
+        }
+
+        @Override public void onItemRangeRemoved(int positionStart, int itemCount) {
+          super.onItemRangeRemoved(positionStart, itemCount);
+          onDataChanged();
+        }
+
+        private void onDataChanged() {
+          if (mAdapter.getItemCount() > 0) {
+            mEmptyText.setVisibility(View.INVISIBLE);
+          } else {
+            mEmptyText.setVisibility(View.VISIBLE);
+          }
+        }
+      };
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    alchemyVision.setApiKey(ApiService.alchemyApikey);
+    alchemyVision.setApiKey(ApiService.alchemyApiKey);
 
     mRealm = WordyApp.realm();
     mRealm.addChangeListener(this);
 
+    mEmptyText = (TextView) findViewById(R.id.empty_view);
     mResults = (RecyclerView) findViewById(R.id.result);
     mResults.setLayoutManager(
         new GridLayoutManager(this, 1, LinearLayoutManager.HORIZONTAL, false));
@@ -74,6 +118,7 @@ public class MainActivity extends AppCompatActivity
     mAdapter.setItemLongClickListener(this);
 
     mResults.setAdapter(mAdapter);
+    mAdapter.registerAdapterDataObserver(mDataChangeObserver);
 
     if (null == savedInstanceState) {
       getFragmentManager().beginTransaction()
@@ -149,15 +194,20 @@ public class MainActivity extends AppCompatActivity
         });
   }
 
+  @Override protected void onPause() {
+    if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+      mSubscription.unsubscribe();
+    }
+    super.onPause();
+  }
+
   @Override protected void onDestroy() {
     if (mRealm != null) {
       mRealm.removeChangeListener(this);
       mRealm.close();
     }
 
-    if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-      mSubscription.unsubscribe();
-    }
+    mAdapter.unregisterAdapterDataObserver(mDataChangeObserver);
     mClickListener = null;
     super.onDestroy();
   }

@@ -26,6 +26,7 @@
       android:focusable="true"
       android:foreground="?attr/selectableItemBackground"
       >
+
     <TextView
         android:id="@+id/result_text"
         android:layout_width="match_parent"

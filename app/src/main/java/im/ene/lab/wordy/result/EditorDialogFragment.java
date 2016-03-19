@@ -81,7 +81,7 @@ public class EditorDialogFragment extends DialogFragment {
       mRealm.executeTransaction(new Realm.Transaction() {
         @Override public void execute(Realm realm) {
           mItem.setResult(newContent.toString());
-          mItem.setState(ResultItem.STATE_EDITTED);
+          mItem.setState(ResultItem.STATE_EDITED);
           realm.copyToRealmOrUpdate(mItem);
           if (mCallback != null) {
             mCallback.onItemUpdated(mItem);
@@ -115,7 +115,7 @@ public class EditorDialogFragment extends DialogFragment {
     if (!Utils.isEmpty(mItem.result)) {
       mOldContent.setText(mItem.result);
     } else {
-      mOldContent.setText("Nothing here yet!");
+      mOldContent.setText("---");
     }
   }
 
