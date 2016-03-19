@@ -1,3 +1,15 @@
+/app/src/androidTest
+/app/src/test
+/app/build
+/.idea/.name
+/.idea/compiler.xml
+/.idea/gradle.xml
+/.idea/runConfigurations.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/encodings.xml
+/.gradle
 *.iml
 .gradle
 /local.properties
