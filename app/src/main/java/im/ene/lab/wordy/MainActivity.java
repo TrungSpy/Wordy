@@ -1,6 +1,7 @@
 package im.ene.lab.wordy;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.camera2.TotalCaptureResult;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +15,7 @@ import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
 import com.ibm.watson.developer_cloud.alchemy.v1.model.ImageKeywords;
 import im.ene.lab.wordy.camera.Camera2BasicFragment;
 import im.ene.lab.wordy.data.api.ApiService;
+import im.ene.lab.wordy.detail.ReviewActivity;
 import im.ene.lab.wordy.result.ResultItem;
 import im.ene.lab.wordy.result.ResultsAdapter;
 import im.ene.lab.wordy.utils.Utils;
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onItemClick(ResultsAdapter parent, View view, int position) {
-    // TODO
+    startActivity(new Intent(this, ReviewActivity.class));
   }
 
   @Override
