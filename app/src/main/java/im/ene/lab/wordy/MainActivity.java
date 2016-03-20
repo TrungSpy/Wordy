@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
@@ -20,6 +21,7 @@ import im.ene.lab.wordy.result.EditorDialogFragment;
 import im.ene.lab.wordy.result.ResultItem;
 import im.ene.lab.wordy.result.ResultsAdapter;
 import im.ene.lab.wordy.utils.ItemUnavailableException;
+import im.ene.lab.wordy.utils.Utils;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -171,6 +173,7 @@ public class MainActivity extends AppCompatActivity
       }
     }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
+        // Bug: deleted item are found here. Have no idea ...
         if (WordyApp.realm()
             .where(ResultItem.class)
             .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
@@ -214,16 +217,20 @@ public class MainActivity extends AppCompatActivity
         .notEqualTo("state", ResultItem.STATE_SUCCESS)
         .findAll();
 
-    mRealm.executeTransaction(new Realm.Transaction() {
-      @Override public void execute(Realm realm) {
-        for (int i = 0; i < retryCache.size(); i++) {
-          ResultItem item = retryCache.get(i);
-          item.setState(ResultItem.STATE_UNKNOWN);
-          realm.copyToRealmOrUpdate(item);
+    if (!Utils.isEmpty(retryCache)) {
+      // Update state to Unknown. We are re-trying.
+      mRealm.executeTransaction(new Realm.Transaction() {
+        @Override public void execute(Realm realm) {
+          for (int i = 0; i < retryCache.size(); i++) {
+            ResultItem item = retryCache.get(i);
+            item.setState(ResultItem.STATE_UNKNOWN);
+            realm.copyToRealmOrUpdate(item);
+          }
         }
-      }
-    });
+      });
+    }
 
+    // Re-try request to Alchemy API
     Observable.from(retryCache).flatMap(new Func1<ResultItem, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ResultItem item) {
         // Convert from Realm Object to normal Object
@@ -296,16 +303,11 @@ public class MainActivity extends AppCompatActivity
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
           @Override public void onClick(DialogInterface dialog, int which) {
             final ResultItem item = parent.getItem(position);
-            final ResultItem resultItem = mRealm.where(ResultItem.class)
-                .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
-                .findFirst();
-            if (resultItem != null) {
-              mRealm.executeTransaction(new Realm.Transaction() {
-                @Override public void execute(Realm realm) {
-                  resultItem.removeFromRealm();
-                }
-              });
-            }
+            mRealm.executeTransaction(new Realm.Transaction() {
+              @Override public void execute(Realm realm) {
+                item.removeFromRealm();
+              }
+            });
           }
         })
         .create()
@@ -314,6 +316,7 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override public void onChange() {
+    Log.e(TAG, "onChange() called with: " + "");
     mAdapter.notifyDataSetChanged();
   }
 
