@@ -8,8 +8,8 @@ A sample project which uses Bluemix's Visual Recognition API for education purpo
 
 ### Screenshots
 
-<img src="https://raw.githubusercontent.com/eneim/Wordy/master/art/device-2016-03-20-104332_framed.png" width="320">
-<img src="https://raw.githubusercontent.com/eneim/Wordy/master/art/sample.png" width="360">
+<img src="https://raw.githubusercontent.com/eneim/Wordy/master/art/device-2016-03-20-104332_framed.png" width="256">
+<img src="https://raw.githubusercontent.com/eneim/Wordy/master/art/sample.png" width="326">
 
 ### Presentation
 
