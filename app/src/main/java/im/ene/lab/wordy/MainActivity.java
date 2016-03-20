@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.ibm.watson.developer_cloud.alchemy.v1.AlchemyVision;
@@ -20,7 +19,7 @@ import im.ene.lab.wordy.detail.ReviewActivity;
 import im.ene.lab.wordy.result.EditorDialogFragment;
 import im.ene.lab.wordy.result.ResultItem;
 import im.ene.lab.wordy.result.ResultsAdapter;
-import im.ene.lab.wordy.utils.Utils;
+import im.ene.lab.wordy.utils.ItemUnavailableException;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -172,7 +171,13 @@ public class MainActivity extends AppCompatActivity
       }
     }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
-        Log.d(TAG, "call() called with: " + "imageKeywords = [" + imageKeywords + "]");
+        if (WordyApp.realm()
+            .where(ResultItem.class)
+            .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
+            .findFirst() == null) {
+          return Observable.error(new ItemUnavailableException("Item is unavailable any longer"));
+        }
+
         item.setImageKeywords(imageKeywords.getImageKeywords());
         return Observable.just(item);
       }
@@ -187,6 +192,10 @@ public class MainActivity extends AppCompatActivity
       }
     }, new Action1<Throwable>() {
       @Override public void call(Throwable throwable) {
+        if (throwable instanceof ItemUnavailableException) {
+          return;
+        }
+
         item.setState(ResultItem.STATE_FAILED);
         WordyApp.realm().executeTransaction(new Realm.Transaction() {
           @Override public void execute(Realm realm) {
@@ -200,10 +209,20 @@ public class MainActivity extends AppCompatActivity
   @Override protected void onResume() {
     super.onResume();
     // Retry
-    RealmResults<ResultItem> retryCache = mRealm.where(ResultItem.class)
+    final RealmResults<ResultItem> retryCache = mRealm.where(ResultItem.class)
         .notEqualTo("state", ResultItem.STATE_EDITED)
         .notEqualTo("state", ResultItem.STATE_SUCCESS)
         .findAll();
+
+    mRealm.executeTransaction(new Realm.Transaction() {
+      @Override public void execute(Realm realm) {
+        for (int i = 0; i < retryCache.size(); i++) {
+          ResultItem item = retryCache.get(i);
+          item.setState(ResultItem.STATE_UNKNOWN);
+          realm.copyToRealmOrUpdate(item);
+        }
+      }
+    });
 
     Observable.from(retryCache).flatMap(new Func1<ResultItem, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ResultItem item) {
@@ -222,7 +241,6 @@ public class MainActivity extends AppCompatActivity
           }
         }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
           @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
-            Log.d(TAG, "call() called with: " + "imageKeywords = [" + imageKeywords + "]");
             item.setImageKeywords(imageKeywords.getImageKeywords());
             return Observable.just(item);
           }
@@ -278,16 +296,16 @@ public class MainActivity extends AppCompatActivity
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
           @Override public void onClick(DialogInterface dialog, int which) {
             final ResultItem item = parent.getItem(position);
-            mRealm.executeTransaction(new Realm.Transaction() {
-              @Override public void execute(Realm realm) {
-                RealmResults<ResultItem> items = realm.where(ResultItem.class)
-                    .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
-                    .findAll();
-                if (!Utils.isEmpty(items)) {
-                  items.clear();
+            final ResultItem resultItem = mRealm.where(ResultItem.class)
+                .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
+                .findFirst();
+            if (resultItem != null) {
+              mRealm.executeTransaction(new Realm.Transaction() {
+                @Override public void execute(Realm realm) {
+                  resultItem.removeFromRealm();
                 }
-              }
-            });
+              });
+            }
           }
         })
         .create()
