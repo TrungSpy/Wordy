@@ -15,6 +15,16 @@ A sample project which uses Bluemix's Visual Recognition API for education purpo
 
 [Speakdeck](https://speakerdeck.com/eneim/hackademics-2016-wordy)
 
+### OSS Used in Wordy
+
+- com.android.support family
+- com.jakewharton:butterknife:7.0.1
+- **com.ibm.watson.developer_cloud:java-sdk:2.8.0**
+- com.github.bumptech.glide:glide:3.7.0
+- io.reactivex:rxandroid:1.1.0
+- io.reactivex:rxjava:1.1.1
+- com.jakewharton.threetenabp:threetenabp:1.0.3
+
 ### LICENSE
 
 Apache 2.0
