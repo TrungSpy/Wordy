@@ -82,14 +82,12 @@
       app:cardPreventCornerOverlap="true"
       >
 
-    <Button
+    <TextView
         android:id="@+id/item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:drawableEnd="@drawable/ic_create_black_24dp"
-        android:drawablePadding="8dp"
         android:gravity="center"
         android:includeFontPadding="false"
         android:paddingBottom="8dp"
@@ -99,7 +97,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textColor="?attr/colorAccent"
         tools:text="Word"
-        style="@style/Widget.AppCompat.Button.Borderless"
         />
 
     <TextView
@@ -110,9 +107,18 @@
         android:gravity="center"
         android:padding="6dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="#e5e5e5"
+        android:textColor="#ccbbbbbb"
         tools:text="2016-11-22"
         />
 
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/button_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:adjustViewBounds="true"
+        app:srcCompat="@drawable/ic_keyboard_control_24dp"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        />
   </android.support.v7.widget.CardView>
 </RelativeLayout>

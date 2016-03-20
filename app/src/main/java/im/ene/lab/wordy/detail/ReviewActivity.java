@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import im.ene.lab.wordy.R;
@@ -19,7 +20,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class ReviewActivity extends AppCompatActivity {
+public class ReviewActivity extends AppCompatActivity implements DetailFragment.Callback {
 
   @Bind(R.id.results) ViewPager mResults;
 
@@ -90,6 +91,20 @@ public class ReviewActivity extends AppCompatActivity {
     }
   }
 
+  @Override public void deleteItem(ResultItem item) {
+    final ResultItem dbItem =
+        mItems.where().equalTo(ResultItem.KEY_CREATED_AT, item.createdAt).findFirst();
+    if (dbItem != null) {
+      mRealm.executeTransaction(new Realm.Transaction() {
+        @Override public void execute(Realm realm) {
+          dbItem.removeFromRealm();
+          Toast.makeText(ReviewActivity.this, "Item removed!", Toast.LENGTH_SHORT).show();
+          mAdapter.notifyDataSetChanged();
+        }
+      });
+    }
+  }
+
   private static class ResultsPagerAdapter extends FragmentStatePagerAdapter {
 
     private final RealmResults<ResultItem> mItems;
@@ -101,6 +116,10 @@ public class ReviewActivity extends AppCompatActivity {
 
     @Override public int getCount() {
       return mItems == null ? 0 : mItems.size();
+    }
+
+    @Override public int getItemPosition(Object object) {
+      return POSITION_NONE; // re-create after data change
     }
 
     @Override public Fragment getItem(int position) {
