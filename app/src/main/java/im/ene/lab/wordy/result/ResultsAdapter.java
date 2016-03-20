@@ -38,18 +38,6 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultItemViewHolder> {
     this.mItemLongClickListener = longClickListener;
   }
 
-  public void addItem(ResultItem item) {
-    synchronized (LOCK) {
-      mSortedItems.add(item);
-    }
-  }
-
-  public void removeItem(ResultItem item) {
-    synchronized (LOCK) {
-      mSortedItems.remove(item);
-    }
-  }
-
   @Override public ResultItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     final ResultItemViewHolder viewHolder = ResultItemViewHolder.createViewHolder(parent, viewType);
     viewHolder.setOnClickListener(new View.OnClickListener() {

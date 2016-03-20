@@ -278,7 +278,6 @@ public class MainActivity extends AppCompatActivity
         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
           @Override public void onClick(DialogInterface dialog, int which) {
             final ResultItem item = parent.getItem(position);
-            parent.removeItem(item);
             mRealm.executeTransaction(new Realm.Transaction() {
               @Override public void execute(Realm realm) {
                 RealmResults<ResultItem> items = realm.where(ResultItem.class)

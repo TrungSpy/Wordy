@@ -29,7 +29,7 @@
         android:paddingTop="@dimen/activity_horizontal_margin"
         android:text="Try me with a Photo ;)"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textColor="@android:color/white"
+        android:textColor="?attr/colorAccent"
         />
 
     <android.support.v7.widget.RecyclerView

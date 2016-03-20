@@ -32,7 +32,7 @@
             android:layout_height="112dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:background="#80000000">
+            android:background="#80ffccbc">
 
             <Button
                 android:id="@+id/picture"
