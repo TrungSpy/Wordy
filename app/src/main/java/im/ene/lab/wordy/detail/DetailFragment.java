@@ -1,16 +1,21 @@
 package im.ene.lab.wordy.detail;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.bumptech.glide.Glide;
 import im.ene.lab.wordy.R;
 import im.ene.lab.wordy.WordyApp;
@@ -27,7 +32,8 @@ import org.threeten.bp.format.DateTimeFormatter;
 /**
  * Created by eneim on 3/19/16.
  */
-public class DetailFragment extends Fragment implements EditorDialogFragment.Callback {
+public class DetailFragment extends Fragment
+    implements EditorDialogFragment.Callback, PopupMenu.OnMenuItemClickListener {
 
   private Long itemId;
   private ResultItem mItem;
@@ -70,17 +76,18 @@ public class DetailFragment extends Fragment implements EditorDialogFragment.Cal
   @Bind(R.id.detail_container) CardView mContainer;
   @Bind(R.id.item_text) TextView mItemText;
   @Bind(R.id.item_timestamp) TextView mTimeStamp;
+  @Bind(R.id.button_actions) AppCompatImageButton mActions;
+
+  @OnClick(R.id.button_actions) void actions() {
+    PopupMenu popupMenu = new PopupMenu(getContext(), mActions);
+    popupMenu.setOnMenuItemClickListener(DetailFragment.this);
+    popupMenu.inflate(R.menu.item_detail_actions);
+    popupMenu.show();
+  }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     ButterKnife.bind(this, view);
-    mItemText.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        EditorDialogFragment dialogFragment = EditorDialogFragment.newInstance(mItem.createdAt);
-        dialogFragment.setTargetFragment(DetailFragment.this, 0);
-        dialogFragment.show(getChildFragmentManager(), EditorDialogFragment.TAG);
-      }
-    });
   }
 
   @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -103,5 +110,46 @@ public class DetailFragment extends Fragment implements EditorDialogFragment.Cal
     } else {
       mItemText.setText("---");
     }
+  }
+
+  private static final String TAG = "DetailFragment";
+
+  @Override public boolean onMenuItemClick(MenuItem item) {
+    int itemId = item.getItemId();
+    switch (itemId) {
+      case R.id.action_edit:
+        EditorDialogFragment dialogFragment = EditorDialogFragment.newInstance(mItem.createdAt);
+        dialogFragment.setTargetFragment(DetailFragment.this, 0);
+        dialogFragment.show(getChildFragmentManager(), EditorDialogFragment.TAG);
+        return true;
+      case R.id.action_delete:
+        if (mCallback != null) {
+          mCallback.deleteItem(mItem);
+          return true;
+        } else {
+          return false;
+        }
+      default:
+        return false;
+    }
+  }
+
+  private Callback mCallback;
+
+  @Override public void onAttach(Context context) {
+    super.onAttach(context);
+    if (context instanceof Callback) {
+      mCallback = (Callback) context;
+    }
+  }
+
+  @Override public void onDetach() {
+    mCallback = null;
+    super.onDetach();
+  }
+
+  public interface Callback {
+
+    void deleteItem(ResultItem item);
   }
 }
