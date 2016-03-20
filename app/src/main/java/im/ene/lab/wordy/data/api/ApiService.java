@@ -5,5 +5,5 @@ package im.ene.lab.wordy.data.api;
  */
 public class ApiService {
 
-  public static final String alchemyApiKey = "8e0f2575964c66588f41a109cf74f0d659f42d1b";
+  public static final String alchemyApiKey = "72466f8b35e29f04b20a74ac2935a1770d6000ff";
 }
