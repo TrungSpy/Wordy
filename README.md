@@ -26,7 +26,7 @@ A sample project which uses Bluemix's Visual Recognition API for education purpo
 - This project is under Apache 2.0 License, so you are free to contribute and give feedback to this project by following license's term.
 - Contributors should follow fork-flow to make the contribution clean and easy.
 - ***Every contribution and feedback are welcome.***
-- 
+
 ### OSS Used in Wordy
 
 - com.android.support family
