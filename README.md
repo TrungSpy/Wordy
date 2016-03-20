@@ -19,7 +19,7 @@ A sample project which uses Bluemix's Visual Recognition API for education purpo
 
 - Prerequirement: Android Studio (1.5.1 is recommended), latest version of Bundles.
 - Fork and clone the repo to your machine.
-- From root, run ```./gradlew installDebug```, your app would up and running.
+- From root folder of the project, run ```./gradlew installDebug```, your app would up and running.
 
 ### Contribute, extends
 
