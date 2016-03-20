@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity
       }
     }).flatMap(new Func1<ImageKeywords, Observable<ResultItem>>() {
       @Override public Observable<ResultItem> call(ImageKeywords imageKeywords) {
-        // Bug: deleted item are found here. Have no idea ...
+        // FIXME Bug: deleted item are found here. Have no idea ...
         if (WordyApp.realm()
             .where(ResultItem.class)
             .equalTo(ResultItem.KEY_CREATED_AT, item.createdAt)
