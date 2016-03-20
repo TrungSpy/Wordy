@@ -6,4 +6,13 @@
   <string name="request_permission">This sample needs camera permission.</string>
   <string name="camera_error">This device doesn\'t support Camera2 API.</string>
   <string name="title_activity_main2">Main2Activity</string>
+
+  <string name="path_face_mouth_sad">
+    M 15,55
+    Q 50,50 85,55
+  </string>
+  <string name="path_face_mouth_happy">
+    M 15,45
+    Q 50,65 85,45
+  </string>
 </resources>
