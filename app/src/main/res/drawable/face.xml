@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="360dp"
+    android:viewportHeight="100"
+    android:viewportWidth="100"
+    android:width="360dp">
+  <path
+      android:name="mouth"
+      android:pathData="@string/path_face_mouth_sad"
+      android:strokeColor="?attr/colorAccent"
+      android:strokeLineCap="round"
+      android:strokeWidth="4"/>
+</vector>

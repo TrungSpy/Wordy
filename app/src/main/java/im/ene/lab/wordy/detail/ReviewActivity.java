@@ -52,9 +52,9 @@ public class ReviewActivity extends AppCompatActivity {
       mInitItemId = getIntent().getLongExtra(EXTRAS_INIT_ITEM_ID, -1L);
     }
 
-    if (mInitItemId == -1L) {
-      finish();
-    }
+    //if (mInitItemId == -1L) {
+    //  finish();
+    //}
   }
 
   @Override protected void onResume() {

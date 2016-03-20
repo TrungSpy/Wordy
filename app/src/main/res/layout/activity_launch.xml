@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffccbc"
+    tools:context="im.ene.lab.wordy.LaunchActivity"
+    >
+
+  <LinearLayout
+      android:id="@+id/action_container"
+      android:layout_width="wrap_content"
+      android:layout_height="280dp"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:alpha="0.0"
+      android:gravity="bottom"
+      android:minWidth="256dp"
+      android:orientation="horizontal"
+      android:scaleX="0.0"
+      android:scaleY="0.0"
+      >
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/button_start"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="@drawable/circle_button"
+        android:backgroundTint="?attr/colorAccent"
+        android:backgroundTintMode="src_in"
+        android:elevation="8dp"
+        app:srcCompat="@drawable/ic_camera_alt_24dp"
+        />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="@dimen/activity_vertical_margin"
+        android:layout_weight="1"
+        />
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/button_review"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="@drawable/circle_button"
+        android:backgroundTint="?attr/colorAccent"
+        android:backgroundTintMode="src_in"
+        android:elevation="8dp"
+        app:srcCompat="@drawable/ic_folder_24dp"
+        />
+
+  </LinearLayout>
+
+  <android.support.v7.widget.AppCompatImageView
+      android:id="@+id/launch_image"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      app:srcCompat="@drawable/ic_launch"
+      />
+
+  <android.support.v7.widget.AppCompatImageView
+      android:id="@+id/app_name_banner"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/launch_image"
+      android:layout_centerHorizontal="true"
+      android:scaleX="0.625"
+      android:scaleY="0.625"
+      app:srcCompat="@drawable/ic_wordy_banner"
+      />
+
+  <android.support.v7.widget.AppCompatImageView
+      android:id="@+id/smile_face"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:visibility="invisible"
+      app:srcCompat="@drawable/smile_face"
+      />
+
+</RelativeLayout>
