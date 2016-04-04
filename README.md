@@ -40,3 +40,7 @@ A sample project which uses Bluemix's Visual Recognition API for education purpo
 ### LICENSE
 
 Apache 2.0
+
+### Reference 
+About Realm 
+http://qiita.com/wasabeef_jp/items/92bb700e37a0a57fc765
